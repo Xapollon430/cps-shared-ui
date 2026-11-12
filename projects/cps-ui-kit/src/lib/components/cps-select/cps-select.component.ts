@@ -419,6 +419,10 @@ export class CpsSelectComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes.disabled && this.disabled && this.isOpened) {
+      this._toggleOptions(false);
+      this._dehighlightOption();
+    }
     if (changes.width) {
       this.cvtWidth = convertSize(this.width);
     }
@@ -445,7 +449,7 @@ export class CpsSelectComponent
   }
 
   private _toggleOptions(show?: boolean): void {
-    if (this.disabled || this.isOpened === show) return;
+    if ((this.disabled && show !== false) || this.isOpened === show) return;
 
     if (typeof show === 'boolean') {
       if (show) {
@@ -537,6 +541,8 @@ export class CpsSelectComponent
   }
 
   private _clickOption(option: any) {
+    if (this.disabled) return;
+
     this.select(option, false);
     if (!this.multiple) {
       this._toggleOptions(false);
@@ -664,6 +670,8 @@ export class CpsSelectComponent
   }
 
   toggleAll() {
+    if (this.disabled) return;
+
     let res = [];
     if (this.value.length < this.options.length) {
       if (this.returnObject) {

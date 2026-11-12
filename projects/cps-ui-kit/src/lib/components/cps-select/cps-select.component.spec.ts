@@ -72,6 +72,25 @@ describe('CpsSelectComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should close an open options menu when disabled and ignore selection', fakeAsync(() => {
+    fixture.componentRef.setInput('returnObject', false);
+    component.writeValue('opt1');
+    component.onBoxClick();
+    fixture.detectChanges();
+    tick();
+    expect(component.isOpened).toBe(true);
+    const changed = jest.spyOn(component.valueChanged, 'emit');
+
+    fixture.componentRef.setInput('disabled', true);
+    fixture.detectChanges();
+    component.onOptionClick({ label: 'Option 2', value: 'opt2' });
+    tick();
+
+    expect(component.isOpened).toBe(false);
+    expect(component.value).toBe('opt1');
+    expect(changed).not.toHaveBeenCalled();
+  }));
+
   describe('Display', () => {
     it('should display the label when provided', () => {
       fixture.componentRef.setInput('label', 'Test Label');
