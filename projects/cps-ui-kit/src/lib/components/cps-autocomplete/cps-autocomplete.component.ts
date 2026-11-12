@@ -528,6 +528,9 @@ export class CpsAutocompleteComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes.disabled && this.disabled && this.isOpened) {
+      this._closeAndClear();
+    }
     if (changes.width) {
       this.cvtWidth = convertSize(this.width);
     }
@@ -627,6 +630,8 @@ export class CpsAutocompleteComponent
   }
 
   toggleAll() {
+    if (this.disabled) return;
+
     let res = [];
     if (this.value.length < this.options.length) {
       if (this.returnObject) {
@@ -959,7 +964,7 @@ export class CpsAutocompleteComponent
   }
 
   private _toggleOptions(show?: boolean): void {
-    if (this.disabled || this.isOpened === show) return;
+    if ((this.disabled && show !== false) || this.isOpened === show) return;
 
     this.backspaceClickedOnce = false;
     if (typeof show === 'boolean') {
@@ -999,6 +1004,8 @@ export class CpsAutocompleteComponent
   }
 
   private _clickOption(option: any) {
+    if (this.disabled) return;
+
     this.select(option, false, true, this.multiple);
     if (!this.multiple) {
       // Only close options menu if not loading or validating
@@ -1190,7 +1197,7 @@ export class CpsAutocompleteComponent
   }
 
   private _confirmInput(searchVal: string, needFocusInput: boolean) {
-    if (!this.isOpened) return;
+    if (this.disabled || !this.isOpened) return;
 
     searchVal = searchVal.toLowerCase();
     if (!searchVal) {
@@ -1204,6 +1211,8 @@ export class CpsAutocompleteComponent
       this._dehighlightOption();
       if (shouldUpdateValue) {
         setTimeout(() => {
+          if (this.disabled) return;
+
           this.updateValue(this._getEmptyValue());
           if (needFocusInput) {
             this.cdRef.detectChanges();
